@@ -21,14 +21,16 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         component: injector
     spec:
+      serviceAccountName: "{{ template "vault.fullname" . }}-injector"
       containers:
         - name: sidecar-injector
           image: "{{ .Values.injector.image }}"
           imagePullPolicy: IfNotPresent
           args:
+            - agent-inject
             - -tls-cert-file=/etc/webhook/certs/cert.pem
             - -tls-key-file=/etc/webhook/certs/key.pem
-            - -vaultAddress={{ template "vault.fullname" . }}
+            - -vault-address={{ template "vault.fullname" . }}
             - 2>&1
           volumeMounts:
             - name: webhook-certs
